@@ -1,8 +1,22 @@
-import { initializeApp } from 'firebase/app';
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+import { getFirestore } from "firebase/firestore";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
 
-// TODO: Replace the following with your app's Firebase project configuration
+// Your web app's Firebase configuration
+
 const firebaseConfig = {
-  //...
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: "storygenieio.firebaseapp.com",
+  projectId: "storygenieio",
+  storageBucket: "storygenieio.appspot.com",
+  messagingSenderId: "988979911422",
+  appId: "1:988979911422:web:4f6b90ea4cba7b29c723af",
+  measurementId: "G-96Z0MTXBEY",
 };
 
+// Initialize Firebase
 export const app = initializeApp(firebaseConfig);
+
+export const db = getFirestore(app);

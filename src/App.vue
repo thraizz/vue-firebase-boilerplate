@@ -1,3 +1,6 @@
+<script setup lang="ts">
+import Layout from "./views/Layout.vue";
+</script>
 <template>
-  <h1>It works.</h1>
+  <Layout>It works.</Layout>
 </template>
