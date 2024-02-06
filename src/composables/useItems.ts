@@ -46,33 +46,32 @@ export const useItems = defineStore("items", () => {
       ITEM_PATH,
     );
     const itemsSnapshot = await getDocs(itemsCollection);
-    const itemsList = await itemsSnapshot.docs.reduce(async (acc, doc) => {
-      // Fetch nested `colums` collection
-      const columnsCollection = collection(itemsCollection, doc.id, "columns");
-      // Get documents from `columns` collection
-      const columnsSnapshot = await getDocs(columnsCollection);
-      const columns = columnsSnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
+    const itemsList = await itemsSnapshot.docs.reduce(
+      async (acc, doc) => {
+        // Fetch nested `colums` collection
+        const columnsCollection = collection(
+          itemsCollection,
+          doc.id,
+          "columns",
+        );
+        // Get documents from `columns` collection
+        const columnsSnapshot = await getDocs(columnsCollection);
+        const columns = columnsSnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
 
-      return { ...acc, [doc.id]: { ...doc.data(), columns } };
-    }, {} as Promise<Record<string, MyItem>>);
+        return { ...acc, [doc.id]: { ...doc.data(), columns } };
+      },
+      {} as Promise<Record<string, MyItem>>,
+    );
     items.value = itemsList;
   };
-
 
   const setAttributeOfItem = async (item: MyItem, text: string) => {
     if (uuid.value === undefined || selectedItemId.value === undefined) return;
 
-    const boardRef = doc(
-      db,
-      "userdata",
-      uuid.value,
-      "items",
-      item.id,
-
-    );
+    const boardRef = doc(db, "userdata", uuid.value, "items", item.id);
     await updateDoc(boardRef, {
       text,
     });

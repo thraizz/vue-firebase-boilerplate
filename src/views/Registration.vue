@@ -5,8 +5,8 @@ import { watch } from "vue";
 import { useRouter } from "vue-router";
 import { string } from "yup";
 
+import { logInWithFirebase, useUser } from "@//user";
 import { app } from "@/firebase";
-import { logInWithFirebase, useUser } from "../user";
 type FormData = {
   email: string;
   password: string;

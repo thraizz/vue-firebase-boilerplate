@@ -31,6 +31,7 @@ const cta = {
             <ArrowLeftIcon class="size-4" /> Back
           </router-link>
         </div>
+
         <router-link
           v-if="$route.path !== creationPath"
           :to="cta.path"

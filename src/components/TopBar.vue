@@ -4,6 +4,7 @@ import { UserCircleIcon } from "@heroicons/vue/20/solid";
 import { Bars3Icon, BellIcon, XMarkIcon } from "@heroicons/vue/24/outline";
 
 import { signOut, userNavigation, useUser } from "@/user";
+
 import UserMenu from "./UserMenu.vue";
 
 const userStore = useUser();
