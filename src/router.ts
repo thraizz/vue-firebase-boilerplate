@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router";
 
+import { auth } from "./firebase";
 import { useUser } from "./user";
 import HomeVue from "./views/Home.vue";
 
@@ -34,10 +35,15 @@ export const router = createRouter({
 
 const protectedRoutes: string[] = [];
 router.beforeEach((to, from, next) => {
-  const { isLoggedIn } = useUser();
-  if (protectedRoutes.includes(to.path) && !isLoggedIn) {
-    next("/login");
-  } else {
-    next();
-  }
+  auth.authStateReady().then(() => {
+    const { isLoggedIn } = useUser();
+    if (
+      (to.meta.requiresAuth || protectedRoutes.includes(to.path)) &&
+      !isLoggedIn
+    ) {
+      next("/login");
+    } else {
+      next();
+    }
+  });
 });

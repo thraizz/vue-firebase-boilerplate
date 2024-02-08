@@ -4,6 +4,7 @@ import { watch } from "vue";
 import { useRouter } from "vue-router";
 import { string } from "yup";
 
+import GoogleSSO from "@/components/GoogleSSO.vue";
 import { logInWithFirebase, useUser } from "@/user";
 const router = useRouter();
 
@@ -130,6 +131,22 @@ watch(
           </router-link>
         </div>
       </form>
+
+      <div className="mt-6">
+        <div className="relative">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-zinc-300" />
+          </div>
+
+          <div className="relative flex justify-center text-sm">
+            <span className="bg-white px-2 text-neutral-800">Or</span>
+          </div>
+        </div>
+
+        <div className="mt-6 flex justify-center">
+          <GoogleSSO />
+        </div>
+      </div>
     </div>
   </div>
 </template>
