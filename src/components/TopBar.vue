@@ -38,8 +38,6 @@ const appNavigation = [
         >
 
         <div class="flex flex-row items-center gap-4">
-          <SearchBar class="hidden lg:flex" />
-
           <UserMenu />
 
           <div class="flex lg:hidden">
@@ -74,8 +72,6 @@ const appNavigation = [
           class="navigation-item"
           >{{ item.name }}</router-link
         >
-
-        <SearchBar />
       </div>
 
       <div class="border-t border-indigo-700 pb-3 pt-4">
