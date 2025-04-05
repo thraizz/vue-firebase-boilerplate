@@ -1,17 +1,18 @@
 <script setup lang="ts">
-import { createUserWithEmailAndPassword, getAuth } from "firebase/auth";
-import { useField, useForm } from "vee-validate";
-import { watch } from "vue";
-import { useRouter } from "vue-router";
-import { string } from "yup";
+import { logInWithFirebase, useUser } from '@//user';
+import { app } from '@/firebase';
+import { createUserWithEmailAndPassword, getAuth } from 'firebase/auth';
+import { useField, useForm } from 'vee-validate';
+import { watch } from 'vue';
 
-import { logInWithFirebase, useUser } from "@//user";
-import { app } from "@/firebase";
-type FormData = {
+import { useRouter } from 'vue-router';
+import { string } from 'yup';
+
+interface FormData {
   email: string;
   password: string;
   confirmPassword: string;
-};
+}
 const { handleSubmit, resetForm, setErrors } = useForm<FormData>({
   validationSchema: {
     email: string().required().email(),
@@ -19,9 +20,9 @@ const { handleSubmit, resetForm, setErrors } = useForm<FormData>({
     confirmPassword: string(),
   },
   initialValues: {
-    email: "",
-    password: "",
-    confirmPassword: "",
+    email: '',
+    password: '',
+    confirmPassword: '',
   },
 });
 
@@ -31,31 +32,30 @@ const onSubmit = handleSubmit(
   (values: FormData) => {
     const auth = getAuth(app);
 
-    console.log(values);
     createUserWithEmailAndPassword(auth, values.email, values.password)
       .then(() => {
         logInWithFirebase(values.email, values.password);
         resetForm();
-        router.push("/");
+        router.push('/');
       })
       .catch(() => {
         setErrors({
-          email: "Invalid email or password.",
-          password: "Invalid email or password.",
+          email: 'Invalid email or password.',
+          password: 'Invalid email or password.',
         });
       });
   },
   // Failure
-  (errors) => {
-    console.log(errors);
+  (errors: any) => {
+    console.error(errors);
   },
 );
 
-const { value: email, errorMessage: emailError } = useField<string>("email");
-const { value: password, errorMessage: passwordError } =
-  useField<string>("password");
-const { value: confirmPassword, errorMessage: confirmPasswordError } =
-  useField("confirmPassword");
+const { value: email, errorMessage: emailError } = useField<string>('email');
+const { value: password, errorMessage: passwordError }
+  = useField<string>('password');
+const { value: confirmPassword, errorMessage: confirmPasswordError }
+  = useField('confirmPassword');
 
 const { isLoggedIn } = useUser();
 
@@ -63,7 +63,7 @@ watch(
   () => isLoggedIn,
   (isLoggedIn) => {
     if (isLoggedIn) {
-      router.push("/");
+      router.push('/');
     }
   },
 );
@@ -71,24 +71,23 @@ watch(
 
 <template>
   <div
-    class="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8"
+    class="lg:px-8 min-h-full flex flex-1 flex-col justify-center px-6 py-12"
   >
     <div class="sm:mx-auto sm:w-full sm:max-w-sm">
       <h2
-        class="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900"
+        class="mt-10 text-center text-2xl text-gray-900 font-bold leading-9 tracking-tight"
       >
         Create an account
       </h2>
     </div>
 
-    <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
+    <div class="sm:mx-auto sm:w-full sm:max-w-sm mt-10">
       <form class="space-y-6" @submit="onSubmit">
         <div>
           <label
             for="email"
-            class="block text-sm font-medium leading-6 text-gray-900"
-            >Email address</label
-          >
+            class="block text-sm text-gray-900 font-medium leading-6"
+          >Email address</label>
 
           <div class="mt-2">
             <input
@@ -99,18 +98,19 @@ watch(
               autocomplete="email"
               required
               class="input"
-            />
+            >
           </div>
 
-          <p v-if="emailError" class="error">{{ emailError }}</p>
+          <p v-if="emailError" class="error">
+            {{ emailError }}
+          </p>
         </div>
 
         <div>
           <label
             for="password"
-            class="block text-sm font-medium leading-6 text-gray-900"
-            >Password</label
-          >
+            class="block text-sm text-gray-900 font-medium leading-6"
+          >Password</label>
 
           <div class="mt-2">
             <input
@@ -121,18 +121,19 @@ watch(
               autocomplete="current-password"
               required
               class="input"
-            />
+            >
           </div>
 
-          <p v-if="passwordError" class="error">{{ passwordError }}</p>
+          <p v-if="passwordError" class="error">
+            {{ passwordError }}
+          </p>
         </div>
 
         <div>
           <label
             for="confirmPassword"
-            class="block text-sm font-medium leading-6 text-gray-900"
-            >Confirm Password</label
-          >
+            class="block text-sm text-gray-900 font-medium leading-6"
+          >Confirm Password</label>
 
           <div class="mt-2">
             <input
@@ -143,7 +144,7 @@ watch(
               autocomplete="new-password"
               required
               class="input"
-            />
+            >
           </div>
 
           <p v-if="confirmPasswordError" class="error">
@@ -152,7 +153,9 @@ watch(
         </div>
 
         <div class="flex flex-col gap-2">
-          <button type="submit" class="button primary w-full">Register</button>
+          <button type="submit" class="button primary w-full">
+            Register
+          </button>
 
           <router-link to="/login" class="button outlined w-full">
             Sign In

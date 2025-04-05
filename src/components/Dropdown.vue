@@ -5,8 +5,8 @@ import {
   ListboxLabel,
   ListboxOption,
   ListboxOptions,
-} from "@headlessui/vue";
-import { PhCaretDown, PhCheck } from "@phosphor-icons/vue";
+} from '@headlessui/vue';
+import { PhCaretDown, PhCheck } from '@phosphor-icons/vue';
 
 defineProps<{
   options: string[];
@@ -17,15 +17,16 @@ defineProps<{
 
 const selectedOption = defineModel<string>();
 
-const calculateLinkItemStyle = (active: boolean, selected: boolean) => {
+function calculateLinkItemStyle(active: boolean, selected: boolean) {
   if (active) {
-    return "bg-gray-700 text-white";
-  } else if (selected) {
-    return "bg-slate-50";
+    return 'bg-gray-700 text-white';
+  }
+  else if (selected) {
+    return 'bg-slate-50';
   }
 
-  return "text-gray-900";
-};
+  return 'text-gray-900';
+}
 </script>
 
 <template>
@@ -44,7 +45,7 @@ const calculateLinkItemStyle = (active: boolean, selected: boolean) => {
 
     <div class="relative mt-2">
       <ListboxButton
-        class="flex w-full items-center justify-start gap-2 self-stretch border border-gray-400 bg-white px-3 py-2"
+        class="w-full flex items-center self-stretch justify-start gap-2 border border-gray-400 bg-white px-3 py-2"
         :class="disabled && 'bg-text-50 text-text-300'"
       >
         <span v-if="selectedOption"> {{ selectedOption }} </span>
@@ -65,7 +66,7 @@ const calculateLinkItemStyle = (active: boolean, selected: boolean) => {
         leave-to-class="opacity-0"
       >
         <ListboxOptions
-          class="absolute z-10 mt-1 max-h-60 w-full overflow-y-auto rounded-md bg-white p-4 pr-3 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm"
+          class="sm:text-sm absolute z-10 mt-1 max-h-60 w-full overflow-y-auto rounded-md bg-white p-4 pr-3 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
         >
           <ListboxOption
             v-for="option in options"
@@ -75,11 +76,11 @@ const calculateLinkItemStyle = (active: boolean, selected: boolean) => {
             :value="option"
           >
             <li
-              class="flex cursor-default select-none flex-row items-center rounded-md py-2 pl-3 pr-9"
+              class="flex flex-row cursor-default select-none items-center rounded-md py-2 pl-3 pr-9"
               :class="calculateLinkItemStyle(optionIsActive, optionIsSelected)"
             >
               <span
-                class="relative mr-2 flex h-4 w-4 items-center rounded border"
+                class="relative mr-2 h-4 w-4 flex items-center border rounded"
                 :class="
                   optionIsSelected
                     ? 'border-transparent bg-indigo-500'
@@ -94,7 +95,7 @@ const calculateLinkItemStyle = (active: boolean, selected: boolean) => {
               </span>
 
               <span
-                :class="['block truncate', optionIsSelected && 'font-semibold']"
+                class="block truncate" :class="[optionIsSelected && 'font-semibold']"
               >
                 {{ option }}
               </span>

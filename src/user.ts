@@ -1,21 +1,23 @@
+import type {
+  User,
+  UserCredential,
+} from 'firebase/auth';
+import { app } from '@/firebase';
 import {
   getAuth,
   signInWithEmailAndPassword,
-  User,
-  UserCredential,
-} from "firebase/auth";
-import { defineStore } from "pinia";
-import { ref } from "vue";
+} from 'firebase/auth';
+import { defineStore } from 'pinia';
 
-import { app } from "@/firebase";
+import { ref } from 'vue';
 
 export const userNavigation = [
-  { name: "Your Profile", href: "#" },
-  { name: "Settings", href: "#" },
+  { name: 'Your Profile', href: '#' },
+  { name: 'Settings', href: '#' },
 ];
 
 // User firebase to receive current user and autheticaiton status.
-export const useUser = defineStore("user", () => {
+export const useUser = defineStore('user', () => {
   const user = ref<User | null>(null);
   const isLoggedIn = ref(false);
 
@@ -38,12 +40,13 @@ export const logInWithFirebase: (
   const auth = getAuth(app);
   try {
     return signInWithEmailAndPassword(auth, email, password);
-  } catch (error) {
+  }
+  catch (error) {
     return Promise.reject(error);
   }
 };
 
-export const signOut = async () => {
+export async function signOut() {
   const auth = getAuth(app);
   await auth.signOut();
-};
+}

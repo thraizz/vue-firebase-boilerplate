@@ -1,39 +1,41 @@
 <script setup lang="ts">
-import {
+import type {
   AuthError,
+} from 'firebase/auth';
+import { auth } from '@/firebase';
+import {
   browserLocalPersistence,
   GoogleAuthProvider,
   setPersistence,
   signInWithPopup,
   signInWithRedirect,
-} from "firebase/auth";
-import { useRouter } from "vue-router";
+} from 'firebase/auth';
 
-import { auth } from "@/firebase";
+import { useRouter } from 'vue-router';
 
 function errorHasCode(e: object | null): e is AuthError {
-  return e !== null && "code" in e;
+  return e !== null && 'code' in e;
 }
 const router = useRouter();
-const signIn = async () => {
+async function signIn() {
   const provider = new GoogleAuthProvider();
   await setPersistence(auth, browserLocalPersistence);
   signInWithPopup(auth, provider)
-    .then(() => router.push("/"))
+    .then(() => router.push('/'))
     .catch(async (e) => {
-      if (typeof e === "object" && errorHasCode(e)) {
-        if (e.code === "auth/popup-blocked") {
-          await signInWithRedirect(auth, provider).then(() => router.push("/"));
+      if (typeof e === 'object' && errorHasCode(e)) {
+        if (e.code === 'auth/popup-blocked') {
+          await signInWithRedirect(auth, provider).then(() => router.push('/'));
         }
       }
     });
-};
+}
 </script>
 
 <template>
   <button
     type="button"
-    class="flex h-10 items-center gap-2 rounded-sm bg-[#4285F4] p-[2px] pr-[8px] text-black dark:text-white"
+    class="h-10 flex items-center gap-2 rounded-sm bg-[#4285F4] p-[2px] pr-[8px] text-black dark:text-white"
     style="{
         fontFamily: 'Roboto'
         fontWeight: 500,
