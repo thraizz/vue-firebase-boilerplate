@@ -1,38 +1,121 @@
 <script setup lang="ts">
-import TopBar from '@/components/TopBar.vue';
-import { ArrowLeftIcon } from '@heroicons/vue/20/solid';
+import AuthButtons from '@/components/AuthButtons.vue';
+import Navigation from '@/components/Navigation.vue';
+import UserMenu from '@/components/UserMenu.vue';
+import { withDefaults } from 'vue';
+import { useCurrentUser } from 'vuefire';
+
+// Props for customization
+interface Props {
+  appName?: string;
+  navigationItems?: Array<{
+    name: string;
+    path: string;
+    active?: boolean;
+  }>;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  appName: 'App',
+  navigationItems: () => [],
+});
+
+const currentUser = useCurrentUser();
 </script>
 
 <template>
-  <div class="min-h-full">
-    <div class="bg-slate-900 pb-32">
-      <TopBar />
+  <div class="min-h-screen bg-gradient-to-br from-slate-50 to-white">
+    <!-- Header with glass effect -->
+    <header class="fixed top-0 left-0 right-0 backdrop-blur-sm bg-white/70 border-b border-slate-100/50 z-10 supports-[backdrop-filter]:bg-white/50">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center h-16">
+          <!-- Brand/Logo Area -->
+          <div class="flex items-center">
+            <router-link to="/" class="text-xl font-medium bg-gradient-to-r from-indigo-500 to-purple-500 bg-clip-text text-transparent">
+              {{ props.appName }}
+            </router-link>
+          </div>
 
-      <header
-        class="lg:px-8 sm:px-6 mx-auto max-w-7xl w-full flex flex-row justify-between px-4 py-10"
-      >
-        <div class="h-20 max-w-7xl">
-          <h1 class="self-center text-3xl text-white font-bold tracking-tight">
-            {{ $route.meta.title }}
-          </h1>
-
-          <router-link
-            v-if="$route.meta.showBack"
-            to=".."
-            class="flex items-center gap-1 text-indigo-200 hover:text-indigo-100"
-          >
-            <ArrowLeftIcon class="size-4" /> Back
-          </router-link>
-        </div>
-      </header>
-    </div>
-
-    <main class="-mt-32">
-      <div class="sm:px-6 lg:px-8 mx-auto max-w-7xl px-4 pb-12">
-        <div class="sm:px-6 rounded-lg bg-white px-5 py-6 shadow">
-          <router-view />
+          <!-- Navigation and User Menu Area -->
+          <div class="flex items-center space-x-4">
+            <template v-if="currentUser">
+              <Navigation />
+              <UserMenu :current-user="currentUser" />
+            </template>
+            <AuthButtons v-else />
+          </div>
         </div>
       </div>
+    </header>
+
+    <!-- Main Content Area with subtle gradient -->
+    <main class="pt-16">
+      <!-- Hero Section Slot -->
+      <slot name="hero" />
+
+      <!-- Main Content Container -->
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <RouterView v-slot="{ Component }">
+          <transition
+            name="page"
+            mode="out-in"
+            appear
+          >
+            <component :is="Component" />
+          </transition>
+        </RouterView>
+      </div>
     </main>
+
+    <!-- Footer Slot -->
+    <footer class="bg-white/50 border-t border-slate-100">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <slot name="footer" />
+      </div>
+    </footer>
   </div>
 </template>
+
+<style scoped>
+/* Page Transition Animations */
+.page-enter-active,
+.page-leave-active {
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
+}
+
+.page-enter-from {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.page-leave-to {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+
+/* Ensure smooth scrolling */
+:deep(html) {
+  scroll-behavior: smooth;
+}
+
+/* Custom scrollbar for modern browsers */
+:deep(::-webkit-scrollbar) {
+  width: 8px;
+  height: 8px;
+}
+
+:deep(::-webkit-scrollbar-track) {
+  background: transparent;
+}
+
+:deep(::-webkit-scrollbar-thumb) {
+  background: var(--color-slate-200);
+  border-radius: 4px;
+}
+
+:deep(::-webkit-scrollbar-thumb:hover) {
+  background: var(--color-slate-300);
+}
+</style>

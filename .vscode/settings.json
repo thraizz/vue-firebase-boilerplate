@@ -1,0 +1,11 @@
+{
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": "always",
+    "source.fixAll.eslint": "explicit"
+  },
+  "editor.defaultFormatter": "dbaeumer.vscode-eslint",
+  "[vue]": {
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+  }
+}

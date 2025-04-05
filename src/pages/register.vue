@@ -1,12 +1,20 @@
 <script setup lang="ts">
-import { logInWithFirebase, useUser } from '@//user';
-import { app } from '@/firebase';
-import { createUserWithEmailAndPassword, getAuth } from 'firebase/auth';
+import { createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/auth';
 import { useField, useForm } from 'vee-validate';
 import { watch } from 'vue';
-
 import { useRouter } from 'vue-router';
-import { string } from 'yup';
+
+import { useCurrentUser, useFirebaseAuth } from 'vuefire';
+import { ref, string } from 'yup';
+
+definePage({
+  name: 'Register',
+  meta: {
+    requiresAuth: false,
+  },
+});
+
+const auth = useFirebaseAuth()!;
 
 interface FormData {
   email: string;
@@ -16,8 +24,16 @@ interface FormData {
 const { handleSubmit, resetForm, setErrors } = useForm<FormData>({
   validationSchema: {
     email: string().required().email(),
-    password: string().required().min(6),
-    confirmPassword: string(),
+    password: string()
+      .required()
+      .min(8, 'Password must be at least 8 characters')
+      .matches(/[A-Z]/, 'Password must contain at least one uppercase letter')
+      .matches(/[a-z]/, 'Password must contain at least one lowercase letter')
+      .matches(/\d/, 'Password must contain at least one number')
+      .matches(/[^A-Z0-9]/i, 'Password must contain at least one special character'),
+    confirmPassword: string()
+      .required()
+      .oneOf([ref('password')], 'Passwords must match'),
   },
   initialValues: {
     email: '',
@@ -29,21 +45,28 @@ const { handleSubmit, resetForm, setErrors } = useForm<FormData>({
 const router = useRouter();
 const onSubmit = handleSubmit(
   // Success
-  (values: FormData) => {
-    const auth = getAuth(app);
-
-    createUserWithEmailAndPassword(auth, values.email, values.password)
-      .then(() => {
-        logInWithFirebase(values.email, values.password);
-        resetForm();
-        router.push('/');
-      })
-      .catch(() => {
-        setErrors({
-          email: 'Invalid email or password.',
-          password: 'Invalid email or password.',
-        });
+  async (values: FormData) => {
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, values.email, values.password);
+      await sendEmailVerification(userCredential.user, {
+        url: `${window.location.origin}/login?email=${encodeURIComponent(values.email)}`,
       });
+      resetForm();
+      router.push('/verify-email');
+    }
+    catch (error: any) {
+      if (error.code === 'auth/email-already-in-use') {
+        setErrors({
+          email: 'This email is already registered.',
+        });
+      }
+      else {
+        setErrors({
+          email: 'Registration failed. Please try again.',
+          password: 'Registration failed. Please try again.',
+        });
+      }
+    }
   },
   // Failure
   (errors: any) => {
@@ -57,12 +80,12 @@ const { value: password, errorMessage: passwordError }
 const { value: confirmPassword, errorMessage: confirmPasswordError }
   = useField('confirmPassword');
 
-const { isLoggedIn } = useUser();
+const currentUser = useCurrentUser();
 
 watch(
-  () => isLoggedIn,
-  (isLoggedIn) => {
-    if (isLoggedIn) {
+  () => currentUser,
+  (currentUser) => {
+    if (currentUser) {
       router.push('/');
     }
   },
@@ -71,7 +94,7 @@ watch(
 
 <template>
   <div
-    class="lg:px-8 min-h-full flex flex-1 flex-col justify-center px-6 py-12"
+    class="lg:px-8 min-h-full flex flex-1 flex-col justify-center px-6 py-12 bg-white rounded-lg shadow-md w-fit mx-auto"
   >
     <div class="sm:mx-auto sm:w-full sm:max-w-sm">
       <h2
@@ -153,11 +176,11 @@ watch(
         </div>
 
         <div class="flex flex-col gap-2">
-          <button type="submit" class="button primary w-full">
+          <button type="submit" class="button primary w-full bg-gradient-to-r from-amber-600 to-red-600 text-white hover:from-amber-700 hover:to-red-700">
             Register
           </button>
 
-          <router-link to="/login" class="button outlined w-full">
+          <router-link to="/login" class="button outlined w-full border-amber-600 text-amber-600 hover:bg-amber-50">
             Sign In
           </router-link>
         </div>

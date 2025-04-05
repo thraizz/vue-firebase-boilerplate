@@ -8,6 +8,16 @@ Then, create your Firebase Cloud Functions by running `firebase init functions`.
 but also activate the necessary APIs in Google Cloud.
 
 ## Development
+
 1. Install dependencies with `pnpmn install`
 2. Start the firebase emulator with `pnpm emulators:start`
 3. Start building your firebase Cloud Functions by going into the functions/ directory and running `pnpm build:watch`
+
+## Features
+
+- Vuefire to interact with Firebase
+- A simple layout with authentication guards in place
+- Login/Register with email/password + Google Auth
+- A sample store for interacting with firestore (src/composables/useExample.ts)
+- A cloud function for deleting user data (functions/src/index.ts)
+- A settings page for deleting the user account (src/pages/settings.vue)

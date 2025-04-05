@@ -1,16 +1,23 @@
 <script setup lang="ts">
 import GoogleSSO from '@/components/GoogleSSO.vue';
-import { logInWithFirebase, useUser } from '@/user';
+import { sendEmailVerification, signInWithEmailAndPassword } from 'firebase/auth';
 import { useField, useForm } from 'vee-validate';
 import { watch } from 'vue';
 
 import { useRouter } from 'vue-router';
+import { useCurrentUser, useFirebaseAuth } from 'vuefire';
+
 import { string } from 'yup';
 
+const auth = useFirebaseAuth()!;
+
 const router = useRouter();
-// @ts-expect-error - definePage is not defined in the current context
+
 definePage({
   name: 'Login',
+  meta: {
+    requiresAuth: false,
+  },
 });
 interface FormData {
   email: string;
@@ -28,19 +35,41 @@ const { handleSubmit, resetForm, setErrors } = useForm<FormData>({
 });
 const onSubmit = handleSubmit(
   // Success
-  (values: FormData) => {
-    // handle form submission here
-    logInWithFirebase(values.email, values.password)
-      .then(() => {
-        resetForm();
-        router.push('/');
-      })
-      .catch(() => {
+  async (values: FormData) => {
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, values.email, values.password);
+
+      if (!userCredential.user.emailVerified) {
+        await sendEmailVerification(userCredential.user, {
+          url: `${window.location.origin}/login?email=${encodeURIComponent(values.email)}`,
+        });
+        router.push('/verify-email');
+        return;
+      }
+
+      resetForm();
+      router.push('/');
+    }
+    catch (error: any) {
+      if (error.code === 'auth/invalid-credential') {
         setErrors({
           email: 'Invalid email or password.',
           password: 'Invalid email or password.',
         });
-      });
+      }
+      else if (error.code === 'auth/too-many-requests') {
+        setErrors({
+          email: 'Too many login attempts. Please try again later.',
+          password: 'Too many login attempts. Please try again later.',
+        });
+      }
+      else {
+        setErrors({
+          email: 'Login failed. Please try again.',
+          password: 'Login failed. Please try again.',
+        });
+      }
+    }
   },
   // Failure
   (errors: any) => {
@@ -51,12 +80,12 @@ const onSubmit = handleSubmit(
 const { value: email, errorMessage: emailError } = useField('email');
 const { value: password, errorMessage: passwordError } = useField('password');
 
-const { isLoggedIn } = useUser();
+const currentUser = useCurrentUser();
 
 watch(
-  () => isLoggedIn,
-  (isLoggedIn) => {
-    if (isLoggedIn) {
+  () => currentUser,
+  (currentUser) => {
+    if (currentUser) {
       router.push('/');
     }
   },
@@ -65,7 +94,7 @@ watch(
 
 <template>
   <div
-    class="lg:px-8 min-h-full flex flex-1 flex-col justify-center px-6 py-12"
+    class="lg:px-8 min-h-full flex flex-1 flex-col justify-center px-6 py-12 bg-white rounded-lg shadow-md w-fit mx-auto"
   >
     <div class="sm:mx-auto sm:w-full sm:max-w-sm">
       <h2
@@ -108,7 +137,7 @@ watch(
             <div class="text-sm">
               <a
                 href="#"
-                class="text-indigo-600 font-semibold hover:text-indigo-500"
+                class="text-amber-600 font-semibold hover:text-red-600"
               >Forgot password?</a>
             </div>
           </div>
@@ -129,11 +158,11 @@ watch(
         </div>
 
         <div class="flex flex-col gap-2">
-          <button type="submit" class="button primary w-full">
+          <button type="submit" class="button primary w-full bg-gradient-to-r from-amber-600 to-red-600 text-white hover:from-amber-700 hover:to-red-700">
             Sign in
           </button>
 
-          <router-link to="/register" class="button outlined w-full">
+          <router-link to="/register" class="button outlined w-full border-amber-600 text-amber-600 hover:bg-amber-50">
             Register
           </router-link>
         </div>

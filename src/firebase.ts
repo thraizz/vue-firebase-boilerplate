@@ -2,9 +2,10 @@
 import { initializeApp } from 'firebase/app';
 import { connectAuthEmulator, getAuth } from 'firebase/auth';
 import { connectFirestoreEmulator, getFirestore } from 'firebase/firestore';
+import { connectFunctionsEmulator, getFunctions } from 'firebase/functions';
+import { connectStorageEmulator, getStorage } from 'firebase/storage';
 
 // Your web app's Firebase configuration
-
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
   authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
@@ -16,13 +17,19 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-export const app = initializeApp(firebaseConfig);
+export const firebaseApp = initializeApp(firebaseConfig);
 
-export const db = getFirestore(app);
+export const db = getFirestore(firebaseApp);
 
-export const auth = getAuth(app);
+export const auth = getAuth(firebaseApp);
+
+export const storage = getStorage(firebaseApp);
+
+export const functions = getFunctions(firebaseApp);
 
 if (import.meta.env.DEV) {
   connectAuthEmulator(auth, 'http://localhost:9099');
   connectFirestoreEmulator(db, 'localhost', 8080);
+  connectStorageEmulator(storage, 'localhost', 9199);
+  connectFunctionsEmulator(functions, 'localhost', 5002);
 }

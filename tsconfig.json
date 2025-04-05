@@ -15,7 +15,11 @@
       "@/*": ["src/*"]
     },
     "resolveJsonModule": true,
-    "types": ["vitest/globals", "vite-plugin-vue-layouts-next/client"],
+    "types": [
+      "vitest/globals",
+      "vite-plugin-vue-layouts-next/client",
+      "unplugin-vue-router/client"
+    ],
     "allowImportingTsExtensions": true,
     /* Linting */
     "strict": true,
