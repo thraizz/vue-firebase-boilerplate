@@ -4,7 +4,7 @@ import { VueFire, VueFireAuth } from 'vuefire';
 import App from './App.vue';
 import { firebaseApp } from './firebase';
 import router from './router';
-import './style.css';
+import './assets/index.css';
 
 const app = createApp(App);
 app.use(router);

@@ -16,8 +16,10 @@ export const deleteUserData = onCall(async (request) => {
 
     const batch = db.batch();
 
-    // Delete user's ratings from the top-level ratings collection
-    // TODO: Add everthing here that the user has created
+    /*
+     * Delete user's ratings from the top-level ratings collection
+     * TODO: Add everthing here that the user has created
+     */
 
     // Commit all deletions
     await batch.commit();

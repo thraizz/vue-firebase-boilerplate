@@ -1,10 +1,12 @@
-import { auth } from '@/firebase.ts';
 import { setupLayouts } from 'virtual:generated-layouts';
 import { createRouter, createWebHistory } from 'vue-router';
 import { routes } from 'vue-router/auto-routes';
+import { auth } from '@/firebase.ts';
 
-// This will automatically generate the routes from the src/pages directory.
-// All new pages should be added to the src/pages directory.
+/*
+ * This will automatically generate the routes from the src/pages directory.
+ * All new pages should be added to the src/pages directory.
+ */
 const router = createRouter({
   history: createWebHistory(),
   routes: setupLayouts(routes),

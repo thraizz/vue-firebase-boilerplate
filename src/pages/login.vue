@@ -1,16 +1,22 @@
 <script setup lang="ts">
-import GoogleSSO from '@/components/GoogleSSO.vue';
 import { sendEmailVerification, signInWithEmailAndPassword } from 'firebase/auth';
 import { useField, useForm } from 'vee-validate';
 import { watch } from 'vue';
-
 import { useRouter } from 'vue-router';
-import { useCurrentUser, useFirebaseAuth } from 'vuefire';
 
+import { useCurrentUser, useFirebaseAuth } from 'vuefire';
 import { string } from 'yup';
 
-const auth = useFirebaseAuth()!;
+import GoogleSSO from '@/components/GoogleSSO.vue';
+import Button from '@/components/ui/button.vue';
+import CardContent from '@/components/ui/card-content.vue';
+import CardHeader from '@/components/ui/card-header.vue';
+import CardTitle from '@/components/ui/card-title.vue';
+import Card from '@/components/ui/card.vue';
+import Input from '@/components/ui/input.vue';
+import Label from '@/components/ui/label.vue';
 
+const auth = useFirebaseAuth()!;
 const router = useRouter();
 
 definePage({
@@ -19,22 +25,26 @@ definePage({
     requiresAuth: false,
   },
 });
+
 interface FormData {
   email: string;
   password: string;
 }
+
 const { handleSubmit, resetForm, setErrors } = useForm<FormData>({
   validationSchema: {
-    email: string().required().email(),
-    password: string().required().min(6),
+    email: string().required()
+      .email(),
+    password: string().required()
+      .min(6),
   },
   initialValues: {
     email: '',
     password: '',
   },
 });
+
 const onSubmit = handleSubmit(
-  // Success
   async (values: FormData) => {
     try {
       const userCredential = await signInWithEmailAndPassword(auth, values.email, values.password);
@@ -71,14 +81,13 @@ const onSubmit = handleSubmit(
       }
     }
   },
-  // Failure
   (errors: any) => {
     console.error(errors);
   },
 );
 
-const { value: email, errorMessage: emailError } = useField('email');
-const { value: password, errorMessage: passwordError } = useField('password');
+const { value: email, errorMessage: emailError } = useField<string>('email');
+const { value: password, errorMessage: passwordError } = useField<string>('password');
 
 const currentUser = useCurrentUser();
 
@@ -93,96 +102,71 @@ watch(
 </script>
 
 <template>
-  <div
-    class="lg:px-8 min-h-full flex flex-1 flex-col justify-center px-6 py-12 bg-white rounded-lg shadow-md w-fit mx-auto"
-  >
-    <div class="sm:mx-auto sm:w-full sm:max-w-sm">
-      <h2
-        class="mt-10 text-center text-2xl text-gray-900 font-bold leading-9 tracking-tight"
-      >
-        Sign in to your account
-      </h2>
-    </div>
+  <div class="flex items-center justify-center p-4">
+    <Card class="w-full max-w-md">
+      <CardHeader class="text-center">
+        <CardTitle class="text-2xl">
+          Sign in
+        </CardTitle>
+      </CardHeader>
+      <CardContent class="space-y-6">
+        <form class="space-y-4" @submit="onSubmit">
+          <div class="space-y-2">
+            <Label for="email">Email</Label>
+            <Input
+              id="email"
+              v-model="email"
+              type="email"
+              placeholder="Enter your email"
+              required
+            />
+            <p v-if="emailError" class="text-sm text-destructive">
+              {{ emailError }}
+            </p>
+          </div>
 
-    <div class="sm:mx-auto sm:w-full sm:max-w-sm mt-10">
-      <form class="space-y-6" @submit="onSubmit">
-        <div>
-          <label
-            for="email"
-            class="block text-sm text-gray-900 font-medium leading-6"
-          >Email address</label>
-
-          <input
-            id="email"
-            v-model="email"
-            name="email"
-            type="email"
-            autocomplete="email"
-            required
-            class="input"
-          >
-
-          <p v-if="emailError" class="error">
-            {{ emailError }}
-          </p>
-        </div>
-
-        <div>
-          <div class="flex items-center justify-between">
-            <label
-              for="password"
-              class="block text-sm text-gray-900 font-medium leading-6"
-            >Password</label>
-
-            <div class="text-sm">
-              <a
-                href="#"
-                class="text-amber-600 font-semibold hover:text-red-600"
-              >Forgot password?</a>
+          <div class="space-y-2">
+            <div class="flex items-center justify-between">
+              <Label for="password">Password</Label>
+              <a href="#" class="text-sm text-muted-foreground hover:text-primary">
+                Forgot password?
+              </a>
             </div>
+            <Input
+              id="password"
+              v-model="password"
+              type="password"
+              placeholder="Enter your password"
+              required
+            />
+            <p v-if="passwordError" class="text-sm text-destructive">
+              {{ passwordError }}
+            </p>
           </div>
 
-          <input
-            id="password"
-            v-model="password"
-            name="password"
-            type="password"
-            autocomplete="current-password"
-            required
-            class="input"
-          >
-
-          <p v-if="passwordError" class="error">
-            {{ passwordError }}
-          </p>
-        </div>
-
-        <div class="flex flex-col gap-2">
-          <button type="submit" class="button primary w-full bg-gradient-to-r from-amber-600 to-red-600 text-white hover:from-amber-700 hover:to-red-700">
-            Sign in
-          </button>
-
-          <router-link to="/register" class="button outlined w-full border-amber-600 text-amber-600 hover:bg-amber-50">
-            Register
-          </router-link>
-        </div>
-      </form>
-
-      <div className="mt-6">
-        <div className="relative">
-          <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-zinc-300" />
+          <div class="space-y-3">
+            <Button type="submit" class="w-full">
+              Sign in
+            </Button>
+            <Button variant="outline" class="w-full" @click="$router.push('/register')">
+              Create account
+            </Button>
           </div>
+        </form>
 
-          <div className="relative flex justify-center text-sm">
-            <span className="bg-white px-2 text-neutral-800">Or</span>
+        <div class="relative">
+          <div class="absolute inset-0 flex items-center">
+            <div class="w-full border-t" />
+          </div>
+          <div class="relative flex justify-center text-xs uppercase">
+            <span class="bg-background px-2 text-muted-foreground">Or</span>
           </div>
         </div>
 
-        <div className="mt-6 flex justify-center">
+        <div class="flex justify-center">
           <GoogleSSO />
         </div>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   </div>
 </template>

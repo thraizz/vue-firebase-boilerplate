@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { functions } from '@/firebase';
 import { deleteUser } from 'firebase/auth';
 import { httpsCallable } from 'firebase/functions';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useCurrentUser, useFirebaseAuth } from 'vuefire';
+import { functions } from '@/firebase';
 
 definePage({
   name: 'Settings',
@@ -22,8 +22,7 @@ const isDeleting = ref(false);
 const showConfirmation = ref(false);
 
 async function deleteAccount() {
-  if (!currentUser.value || !auth)
-    return;
+  if (!currentUser.value || !auth) return;
 
   isDeleting.value = true;
   error.value = '';
